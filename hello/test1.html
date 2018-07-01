@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBzE9xAESye6Kde-3hT-6B90nfwUkcS8Yw&sensor=false">
+    </script>
+
+    <script language="javascript" type="text/javascript">
+        //map定义省略
+
+        var directionsDisplay = new google.maps.DirectionsRenderer({ 'draggable': true ,suppressInfoWindows:true,suppressMarkers:true});
+
+        var service;
+
+        //得到规划路线
+        function getRoute(source,destination,map){
+            var directionsService = new google.maps.DirectionsService();
+            directionsDisplay.setMap(map);
+            var request = {
+                origin: source,
+                destination: destination,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });
+        }
+
+        //得到规划路径的详细些信息
+        function getDetailsRoutes(source,destination,map) {
+            service = new google.maps.DistanceMatrixService();
+            service.getDistanceMatrix({
+                origins: [source],
+                destinations: [destination],
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidHighways: false,
+                avoidTolls: false
+            }, function (response, status) {
+                if (status == google.maps.DistanceMatrixStatus.OK && response.rows[0].elements[0].status != "ZERO_RESULTS") {
+                    var distance = response.rows[0].elements[0].distance.text;
+                    var duration = response.rows[0].elements[0].duration.text;
+                    var dvDistance = document.getElementById("siteinfo_modal_label");
+                    dvDistance.innerHTML = "";
+                    dvDistance.innerHTML += "Distance: " + distance + "<br />";
+                    dvDistance.innerHTML += "Duration:" + duration;
+
+                } else {
+                    alert("Unable to find the distance via road.");
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body >
+<div id="draggable" style="height:500PX;top:30px;width:100%"></div>
+</body>
+
+</html>
